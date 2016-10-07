@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/uploadmusic', function () {
+    return view('music/uploadmusic');
+});
