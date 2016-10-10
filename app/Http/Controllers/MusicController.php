@@ -8,10 +8,6 @@ use DB;
 
 class MusicController extends Controller
 {
-    const QINIU_AccessKey = '22h0jsT4bXwJ5MG3TAWcchEEMThBqZJjiY3FnhlB';
-    const QINIU_SecretKey = 'DNzaFhms7s8dNBRXxdrrHr9FctqUEVVnRFTIH97H';
-    const QINIU_BUCKET = 'musicbox';
-    const QINIU_UPLOAD_API = 'http://up-z1.qiniu.com';
 
     public function viewUploadMusic()
     {
@@ -42,12 +38,10 @@ class MusicController extends Controller
         
         $originName = $file->getClientOriginalName();
 
-        $auth = new Auth(self::QINIU_AccessKey, self::QINIU_SecretKey);
-        $uploadToken = $auth->uploadToken(self::QINIU_BUCKET);
+        $auth = new Auth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
+        $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
 
-
-
-        $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, self::QINIU_UPLOAD_API);
+        $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
 
         $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
 
@@ -75,7 +69,7 @@ class MusicController extends Controller
         } else { //
             $cFile = realpath($file);
         }
-        $post = array('token' => $uploadToken, 'key' => $originName, 'file'=> $file);
+        $post = array('token' => $uploadToken, 'key' => $originName, 'file'=> $cFile);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$uploadApi);
         curl_setopt($ch, CURLOPT_POST,1);
