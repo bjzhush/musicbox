@@ -9,9 +9,15 @@ use DB;
 class MusicController extends Controller
 {
 
-    public function viewUploadMusic()
+    public function viewUploadMusic(Request $request)
     {
-        return view('music.uploadmusic');
+        $msg = $request->input('msg','');
+        if ($msg == 'success') {
+           $msg = '<font color="green">Upload Success !</font>';
+        } else {
+           $msg = '<font color="red">'.$msg.'</font>';
+        }
+        return view('music.uploadmusic', ['msg' => $msg]);
     }
     
     public function response($status = true, $msg)
@@ -28,37 +34,38 @@ class MusicController extends Controller
         $comment = $request->input('comment', '');
         
         if (!$request->hasFile('mfile')) {
-           return $this->response(false, 'no file upload');
+           return redirect('/uploadmusic?msg=no file uploaded');
         }
         
-        $file = $request->file('mfile');
-        
-        $fileTmpPath = $file->path();
-        $md5sum = md5_file($fileTmpPath);
-        
-        $originName = $file->getClientOriginalName();
+        $files = $request->file('mfile');
+        foreach($files as $file) {
+            $fileTmpPath = $file->path();
+            $md5sum = md5_file($fileTmpPath);
 
-        $auth = new Auth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
-        $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
+            $originName = $file->getClientOriginalName();
 
-        $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
+            $auth = new Auth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
+            $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
 
-        $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
+            $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
 
-        if (isset($uploadResult['error'])) {
-           echo 'Error:<font color="red">'.$uploadResult['error'].'</font>';
-           exit;
+            $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
+
+            if (isset($uploadResult['error'])) {
+                echo 'Error:<font color="red">'.$uploadResult['error'].'</font>';
+                exit;
+            }
+
+            DB::table('music')->insert([
+                'uploadname' => $originName,
+                'filemd5' => $md5sum,
+                'qiniu_id' => $uploadResult['hash'],
+                'uploadcomment' => $comment,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
         }
 
-        DB::table('music')->insert([
-            'uploadname' => $originName,
-            'filemd5' => $md5sum,
-            'uploadcomment' => $comment,
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
-        
-        echo "Upload succeed";
-        
+        return redirect('/uploadmusic?msg=success');
         
     }
 
@@ -69,7 +76,7 @@ class MusicController extends Controller
         } else { //
             $cFile = realpath($file);
         }
-        $post = array('token' => $uploadToken, 'key' => $originName, 'file'=> $cFile);
+        $post = array('token' => $uploadToken, 'key' => date('YmdHis').'_'.$originName, 'file'=> $cFile);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$uploadApi);
         curl_setopt($ch, CURLOPT_POST,1);
