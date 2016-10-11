@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AddMusicAttributes' => $baseDir . '/database/migrations/2016_10_11_211505_add_music_attributes.php',
     'AddSongTable' => $baseDir . '/database/migrations/2016_10_09_215203_add_song_table.php',
     'CreatePasswordResetsTable' => $baseDir . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2014_10_12_000000_create_users_table.php',
