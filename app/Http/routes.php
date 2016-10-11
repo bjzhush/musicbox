@@ -11,18 +11,18 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::group(['middleware' => 'auth'], function () {
 //上传
-Route::get('/uploadmusic', 'MusicController@viewUploadMusic');
-Route::post('/uploadmusic', 'MusicController@uploadMusic');
+    Route::get('/uploadmusic', 'MusicController@viewUploadMusic');
+    Route::post('/uploadmusic', 'MusicController@uploadMusic');
 
-//搜索
-Route::get('/searchmusic', 'MusicController@viewSearchMusic');
-Route::post('/searchmusic', 'MusicController@searchMusic');
 
 //列表
-Route::get('/listmusic', 'MusicController@viewListMusic');
-Route::post('/listmusic', 'MusicController@listMusic');
+    Route::get('/listmusic', 'MusicController@viewListMusic');
+    Route::post('/listmusic', 'MusicController@listMusic');
+    Route::get('/','MusicController@viewListMusic');
+    
+});
+
+
+

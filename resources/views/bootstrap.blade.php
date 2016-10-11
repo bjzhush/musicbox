@@ -10,18 +10,16 @@
         </div>
         <div>
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">上传</a></li>
-                <li><a href="#">标记</a></li>
-                <li><a href="#">播放</a></li>
+                <li><a href="/uploadmusic">上传</a></li>
+                <li><a href="/listmusic">列表</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         其它
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="/test">jmeter</a></li>
+                        <li><a href="/logout">退出</a></li>
                         <li class="divider"></li>
-                        <li><a href="#">分离的链接</a></li>
                     </ul>
                 </li>
             </ul>

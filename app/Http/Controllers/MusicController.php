@@ -87,15 +87,6 @@ class MusicController extends Controller
         return $result;
     }
     
-    public function viewSearchMusic()
-    {
-        return view('music.searchmusic');
-    }
-    
-    public function searchMusic(Request $request)
-    {
-        
-    }
     
     public function viewListMusic(Request $request)
     {
