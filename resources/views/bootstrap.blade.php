@@ -11,7 +11,8 @@
         <div>
             <ul class="nav navbar-nav">
                 <li><a href="/uploadmusic">上传</a></li>
-                <li><a href="/listmusic">列表</a></li>
+                <li><a href="/listmusic">编辑</a></li>
+                <li><a href="/listen">静听</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         其它

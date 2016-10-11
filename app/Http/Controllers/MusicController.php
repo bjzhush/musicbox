@@ -87,14 +87,18 @@ class MusicController extends Controller
         return $result;
     }
     
-    
-    public function viewListMusic(Request $request)
-    {
-        return view('music.listmusic');
-    }
 
     public function listMusic(Request $request)
     {
+        $musics = DB::table('music')->paginate(10);
 
+        return view('music.listmusic', [
+            'musics' => $musics,
+        ]);
+    }
+    
+    public function listen(Request $request)
+    {
+        
     }
 }

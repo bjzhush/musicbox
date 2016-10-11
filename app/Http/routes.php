@@ -18,8 +18,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 //列表
-    Route::get('/listmusic', 'MusicController@viewListMusic');
-    Route::post('/listmusic', 'MusicController@listMusic');
+    Route::any('/listmusic', 'MusicController@listMusic');
     Route::get('/','MusicController@viewListMusic');
     
 });
