@@ -1,4 +1,4 @@
-@include('bootstrap')
+@include('nav')
 
 <div class="container-fluid">
     <div class="row-fluid">

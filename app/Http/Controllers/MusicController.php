@@ -127,10 +127,36 @@ class MusicController extends Controller
            exit('no music found');
         }
         $musicInfo = DB::table('music')->where('id', $muiscId)->first();
-        echo "<pre>";
-        var_dump($musicInfo);
-        exit;
+
+        if ($musicInfo->artistid > 0) {
+           $artist = DB::table('artist')->where('id', $musicInfo['artistid'])->list('artist');
+        } else {
+            
+        }
+
         return view('music.editmusic', [
+            'musicInfo' => $musicInfo
         ]);
+    }
+
+    public function searchArtist(Request $request) {
+       $artist = $request->get('key');
+       if (strlen($artist) == 0) {
+           $res = ['0' => '无结果'];
+       } else {
+           $sqlRes = DB::table('artist')
+               ->where('artist', 'like', '%'.$artist.'%')
+               ->take(10)
+               ->get();
+           if (empty($sqlRes)) {
+               $res = ['0' => '无结果'];
+           } else {
+               $res = ['0' => '请选择'];
+               foreach ($sqlRes as $row) {
+                   $res[$row->id] = $row->artist;
+               }
+           }
+       }
+       return json_encode($res);
     }
 }

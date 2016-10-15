@@ -25,6 +25,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/editmusic', 'MusicController@viewEditMusic');
     Route::post('/editmusic', 'MusicController@editMusic');
     
+    Route::post('/searchartist', 'MusicController@searchArtist');
+    
 });
 
 
