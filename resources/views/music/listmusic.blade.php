@@ -33,7 +33,11 @@
                         <td>{{$music->uploadcomment}}</td>
                         <td>{!! $music->markHtml !!}</td>
                         <td>{{$music->created_at}}</td>
-                        <td>todo_listen</td>
+                        <td>
+                            <audio controls="controls" preload="none">
+                                <source src="{{$music->previewUrl}}" type="audio/mpeg" />
+                            </audio>
+                        </td>
                         <td><div class="editmusic" musicid="{{$music->id}}">编辑</div> </td>
                     </tr>
                 @endforeach

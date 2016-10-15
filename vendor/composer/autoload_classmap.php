@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'AddArtistTable' => $baseDir . '/database/migrations/2016_10_15_133727_add_artist_table.php',
     'AddMusicAttributes' => $baseDir . '/database/migrations/2016_10_11_211505_add_music_attributes.php',
+    'AddQiniuFilenameColumnInMusicTable' => $baseDir . '/database/migrations/2016_10_15_185836_add_qiniu_filename_column_in_music_table.php',
     'AddSongTable' => $baseDir . '/database/migrations/2016_10_09_215203_add_song_table.php',
     'AddTagTable' => $baseDir . '/database/migrations/2016_10_15_134536_add_tag_table.php',
     'AddUseridInMusicTable' => $baseDir . '/database/migrations/2016_10_15_135100_add_userid_in_music_table.php',

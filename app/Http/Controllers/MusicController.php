@@ -83,8 +83,10 @@ class MusicController extends Controller
 
             DB::table('music')->insert([
                 'uploadname' => $originName,
+                'user_id' => $this->getCrtUserId(),
                 'filemd5' => $md5sum,
                 'qiniu_id' => $uploadResult['hash'],
+                'qiniu_filename' => $uploadResult['key'],
                 'uploadcomment' => $comment,
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
@@ -121,6 +123,12 @@ class MusicController extends Controller
 
         foreach ($musics as &$row) {
             $row->markHtml = $this->getMarkHtml($row);
+            $row->previewUrl = $this->getQiniuPreviewUrl(
+               config('music.qiniu_accesskey'),
+               config('music.qiniu_secretkey'),
+               config('music.qiniu_preview_domain'),
+               $row->qiniu_filename
+            );
         }
 
         return view('music.listmusic', [
@@ -140,6 +148,11 @@ class MusicController extends Controller
            return '<font color="red">未知状态</font>';
         }
         
+    }
+
+    private function getQiniuPreviewUrl($ak, $sk, $previewDomain, $qiniuFileName) {
+        $auth = new QiniuAuth($ak, $sk);
+        return $auth->privateDownloadUrl($previewDomain.'/'.$qiniuFileName);
     }
     
     public function listen(Request $request)

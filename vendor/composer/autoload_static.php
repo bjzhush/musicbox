@@ -276,6 +276,7 @@ class ComposerStaticInit494fb5dbda77910dfe71cdab27b3d205
     public static $classMap = array (
         'AddArtistTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_133727_add_artist_table.php',
         'AddMusicAttributes' => __DIR__ . '/../..' . '/database/migrations/2016_10_11_211505_add_music_attributes.php',
+        'AddQiniuFilenameColumnInMusicTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_185836_add_qiniu_filename_column_in_music_table.php',
         'AddSongTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_09_215203_add_song_table.php',
         'AddTagTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_134536_add_tag_table.php',
         'AddUseridInMusicTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_135100_add_userid_in_music_table.php',
