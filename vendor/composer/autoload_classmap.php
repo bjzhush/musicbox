@@ -10,6 +10,7 @@ return array(
     'AddMusicAttributes' => $baseDir . '/database/migrations/2016_10_11_211505_add_music_attributes.php',
     'AddSongTable' => $baseDir . '/database/migrations/2016_10_09_215203_add_song_table.php',
     'AddTagTable' => $baseDir . '/database/migrations/2016_10_15_134536_add_tag_table.php',
+    'AddUseridInMusicTable' => $baseDir . '/database/migrations/2016_10_15_135100_add_userid_in_music_table.php',
     'CreatePasswordResetsTable' => $baseDir . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2014_10_12_000000_create_users_table.php',
     'DatabaseSeeder' => $baseDir . '/database/seeds/DatabaseSeeder.php',
