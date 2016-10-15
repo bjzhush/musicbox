@@ -67,6 +67,13 @@ class MusicController extends Controller
             $fileTmpPath = $file->path();
             $md5sum = md5_file($fileTmpPath);
 
+            $md5sumCheck = DB::table('music')->where('filemd5', $md5sum)->first();
+            if (!empty($md5sumCheck)) {
+                echo 'Error:<font color="red">重复文件(id: '.$md5sumCheck->id.')已存在</font><br>';
+                echo '点<a href="/uploadmusic">这里</a>返回';
+                exit;
+            }
+
             $originName = $file->getClientOriginalName();
 
             $auth = new QiniuAuth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
