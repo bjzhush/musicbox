@@ -12,14 +12,18 @@
 */
 
 Route::group(['middleware' => 'auth'], function () {
-//上传
+    //上传
     Route::get('/uploadmusic', 'MusicController@viewUploadMusic');
     Route::post('/uploadmusic', 'MusicController@uploadMusic');
 
 
-//列表
+    //列表
     Route::any('/listmusic', 'MusicController@listMusic');
     Route::get('/','MusicController@listMusic');
+    
+    //编辑
+    Route::get('/editmusic', 'MusicController@viewEditMusic');
+    Route::post('/editmusic', 'MusicController@editMusic');
     
 });
 

@@ -101,4 +101,27 @@ class MusicController extends Controller
     {
         
     }
+    
+    public function editMusic(Request $request)
+    {
+        $post = $request->all();
+        echo "<pre>";
+        var_dump($post);
+        exit;
+        
+    }
+    
+    public function viewEditMusic(Request $request)
+    {
+        $muiscId = $request->get('musicid');
+        if (is_null($muiscId)) {
+           exit('no music found');
+        }
+        $musicInfo = DB::table('music')->where('id', $muiscId)->first();
+        echo "<pre>";
+        var_dump($musicInfo);
+        exit;
+        return view('music.editmusic', [
+        ]);
+    }
 }
