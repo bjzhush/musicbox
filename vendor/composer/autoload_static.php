@@ -274,6 +274,7 @@ class ComposerStaticInit494fb5dbda77910dfe71cdab27b3d205
     );
 
     public static $classMap = array (
+        'AddArtistTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_133727_add_artist_table.php',
         'AddMusicAttributes' => __DIR__ . '/../..' . '/database/migrations/2016_10_11_211505_add_music_attributes.php',
         'AddSongTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_09_215203_add_song_table.php',
         'CreatePasswordResetsTable' => __DIR__ . '/../..' . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
