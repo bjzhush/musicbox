@@ -38,7 +38,7 @@
                                 <source src="{{$music->previewUrl}}" type="audio/mpeg" />
                             </audio>
                         </td>
-                        <td><div class="editmusic" musicid="{{$music->id}}">编辑</div> </td>
+                        <td><div class="editmusic" musicid="{{$music->id}}"><a href="#">编辑</a> </div> </td>
                     </tr>
                 @endforeach
 
