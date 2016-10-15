@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use Qiniu\Auth;
+use Qiniu\Auth as QiniuAuth;
+use Auth;
 use DB;
 
 
 class MusicController extends Controller
 {
+    
+    //获取当前用户的id
+    public function getCrtUserId()
+    {
+        return Auth::User()->id;
+    }
 
     public function viewUploadMusic(Request $request)
     {
@@ -44,7 +51,7 @@ class MusicController extends Controller
 
             $originName = $file->getClientOriginalName();
 
-            $auth = new Auth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
+            $auth = new QiniuAuth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
             $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
 
             $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
@@ -90,7 +97,9 @@ class MusicController extends Controller
 
     public function listMusic(Request $request)
     {
-        $musics = DB::table('music')->paginate(10);
+        $musics = DB::table('music')
+            ->where('user_id', $this->getCrtUserId())
+            ->paginate(10);
 
         return view('music.listmusic', [
             'musics' => $musics,
