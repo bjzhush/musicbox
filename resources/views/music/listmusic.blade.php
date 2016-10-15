@@ -31,7 +31,7 @@
                     <tr class="{{$k%2 ==1 ? "" : "warning"}}">
                         <td>{{$music->uploadname}}</td>
                         <td>{{$music->uploadcomment}}</td>
-                        <td>{!! $music->marked == 0 ? "<font color='red'>待处理</font>" : "<font color='green'>已处理</font>" !!}</td>
+                        <td>{!! $music->markHtml !!}</td>
                         <td>{{$music->created_at}}</td>
                         <td>todo_listen</td>
                         <td><div class="editmusic" musicid="{{$music->id}}">编辑</div> </td>

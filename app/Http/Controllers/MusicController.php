@@ -119,9 +119,27 @@ class MusicController extends Controller
             ->where('user_id', $this->getCrtUserId())
             ->paginate(10);
 
+        foreach ($musics as &$row) {
+            $row->markHtml = $this->getMarkHtml($row);
+        }
+
         return view('music.listmusic', [
             'musics' => $musics,
         ]);
+    }
+
+    public function getMarkHtml($row)
+    {
+        if ($row->marked == 0) {
+           return '<font color="red">待处理</font>';
+        } elseif ($row->marked == 1) {
+           return '<font color="green">已处理</font>';
+        } elseif ($row->marked == 2) {
+           return '<font color="red">暂存</font>';
+        } else {
+           return '<font color="red">未知状态</font>';
+        }
+        
     }
     
     public function listen(Request $request)
