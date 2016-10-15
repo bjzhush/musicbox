@@ -154,10 +154,17 @@ class MusicController extends Controller
                 );
             }
         }
+
+        //1正式，2draft
+        $isDraft = $request->get('is_draft', 1);
         
         DB::table('music')
             ->where('id', $musicId)
-            ->update(['artistid' => $artistId]);
+            ->update([
+                'artistid' => $artistId,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'marked' => $isDraft,
+            ]);
         
         return $this->jsonSuccess('success');
     }

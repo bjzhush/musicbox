@@ -21,11 +21,13 @@
         };
         
         $('#savemusic').on('click', function () {
+            $('#ajaxtext').empty();
 
             var data = {};
             data['music_id'] = $('#musicid').val();
             data['artist_id'] = $('#artist_input').attr('artistid');
             data['artist_name'] = $('#artist_input').val();
+            data['is_draft'] = $('#isdraft').is(":checked") ? 2 : 1;
 
             $.ajax({
                 type: 'POST',
@@ -34,10 +36,10 @@
                 dataType:'json',
                 success: function (msg) {
                     if (msg.code == 200) {
-                        alert('yes');
+                        $('#ajaxtext').html('<font color="green">保存成功</font>');
                         return;
                     } else {
-                        alert('no');
+                        $('#ajaxtext').html('<font color="red">保存失败'+ msg.msg +'</font>');
                         return;
                     }
                 }
@@ -86,14 +88,20 @@
                 <select name="artist_search" id="artist_search">
                 </select>
 
-                <div class="col-xs-12" style="height:50px;"></div>
 
+            </div>
+            <div class="controls">
+                暂存 <input type="checkbox" id="isdraft" value="0">
+
+                <div class="col-xs-12" style="height:50px;"></div>
 
             </div>
 
         </div>
 
+
         <button class="btn btn-success" id="savemusic">保存</button>
+        <div id="ajaxtext"></div>
 
 
     </fieldset>
