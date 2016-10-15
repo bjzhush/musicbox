@@ -277,6 +277,7 @@ class ComposerStaticInit494fb5dbda77910dfe71cdab27b3d205
         'AddArtistTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_133727_add_artist_table.php',
         'AddMusicAttributes' => __DIR__ . '/../..' . '/database/migrations/2016_10_11_211505_add_music_attributes.php',
         'AddSongTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_09_215203_add_song_table.php',
+        'AddTagTable' => __DIR__ . '/../..' . '/database/migrations/2016_10_15_134536_add_tag_table.php',
         'CreatePasswordResetsTable' => __DIR__ . '/../..' . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2014_10_12_000000_create_users_table.php',
         'DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeds/DatabaseSeeder.php',
