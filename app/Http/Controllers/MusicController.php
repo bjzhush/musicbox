@@ -9,7 +9,25 @@ use DB;
 
 class MusicController extends Controller
 {
-    
+    public function jsonSuccess($msg) {
+        return json_encode(
+            [
+                'code' => 200,
+                'msg' => $msg,
+            ]
+        );
+    }
+
+    public function jsonFail($msg) {
+        return json_encode(
+            [
+                'code' => 500,
+                'msg' => $msg,
+            ]
+        );
+    }
+
+
     //获取当前用户的id
     public function getCrtUserId()
     {
@@ -113,11 +131,35 @@ class MusicController extends Controller
     
     public function editMusic(Request $request)
     {
-        $post = $request->all();
-        echo "<pre>";
-        var_dump($post);
-        exit;
+        $artistName = $request->get('artist_name', NULl);
+        $artistId = $request->get('artist_id', NULL);
+        if (is_null($artistName) && is_null($artistId)) {
+            return $this->jsonFail('no id and name found');
+        }
+        $musicId = $request->get('music_id', NULL);
+        if (is_null($musicId)) {
+            return $this->jsonFail('no musicid found');
+        }
+        if ($artistId == 0) {
+
+            $repeatCheck = DB::table('artist')->select('id')->where('artist', $artistName)->first();
+            if (!empty($repeatCheck)) {
+                $artistId = $repeatCheck->id;
+            } else {
+                $artistId = DB::table('artist')->insert(
+                    [
+                        'artist' => $artistName,
+                        'created_at' => date('Y-m-d H:i:s'),
+                    ]
+                );
+            }
+        }
         
+        DB::table('music')
+            ->where('id', $musicId)
+            ->update(['artistid' => $artistId]);
+        
+        return $this->jsonSuccess('success');
     }
     
     public function viewEditMusic(Request $request)
@@ -129,9 +171,8 @@ class MusicController extends Controller
         $musicInfo = DB::table('music')->where('id', $muiscId)->first();
 
         if ($musicInfo->artistid > 0) {
-           $artist = DB::table('artist')->where('id', $musicInfo['artistid'])->list('artist');
-        } else {
-            
+            $artistRow = DB::table('artist')->select('artist')->where('id', $musicInfo->artistid)->first();
+            $musicInfo->artist = $artistRow->artist;
         }
 
         return view('music.editmusic', [

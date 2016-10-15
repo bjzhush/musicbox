@@ -19,6 +19,31 @@
                 }
             });
         };
+        
+        $('#savemusic').on('click', function () {
+
+            var data = {};
+            data['music_id'] = $('#musicid').val();
+            data['artist_id'] = $('#artist_input').attr('artistid');
+            data['artist_name'] = $('#artist_input').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/editmusic',
+                data: data,
+                dataType:'json',
+                success: function (msg) {
+                    if (msg.code == 200) {
+                        alert('yes');
+                        return;
+                    } else {
+                        alert('no');
+                        return;
+                    }
+                }
+            });
+
+        })
 
         $('#artist_search').hide();
 
@@ -30,9 +55,9 @@
 
         $('#artist_search').on('change', function () {
             var selectedValue = $(this).val();
+            $('#artist_input').attr('artistid', selectedValue);
             if (selectedValue > 0) {
                 $('#artist_input').val($(this).find("option:selected").text());
-                $('#artist_input').attr('musicid', selectedValue);
             }
 
         })
@@ -42,11 +67,13 @@
 
 
 
-<form class="form-horizontal">
+<div class="form-horizontal">
     <fieldset>
         <div id="legend" class="">
             <legend class="">编辑音乐</legend>
         </div>
+        <input type="hidden" id="musicid" value="{{$musicInfo->id}}">
+
 
 
         <div class="control-group">
@@ -54,7 +81,7 @@
             <!-- Search input-->
             <div class="controls">
                 <label class="control-label">歌手名</label>
-                <input type="text" placeholder="搜索或输入" class="input-xlarge search-query" id="artist_input" musicid="0">
+                <input type="text" placeholder="搜索或输入" value="{{isset($musicInfo->artist) ? $musicInfo->artist : ''}}" class="input-xlarge search-query" id="artist_input" artistid="{{$musicInfo->artistid}}">
 
                 <select name="artist_search" id="artist_search">
                 </select>
@@ -66,10 +93,10 @@
 
         </div>
 
-        <button class="btn btn-success">保存</button>
+        <button class="btn btn-success" id="savemusic">保存</button>
 
 
     </fieldset>
 
 
-</form>
+</div>
