@@ -164,7 +164,28 @@ class MusicController extends Controller
     
     public function listen(Request $request)
     {
+        $maxIdRow = DB::table('music')->select('id')->orderby('id','desc')->first();
+        if (empty($maxIdRow)) {
+           exit('No music found');
+        }
+        $maxId = $maxIdRow->id;
+        $count = 0;
+        while(!isset($randomRow) || empty($randomRow) && $count < 10) {
+            $count++;
+            $randomId = rand(1, $maxId);
+            $randomRow = DB::table('music')->where('id', $randomId)->first();
+        }
+        $randomRow->listenUrl = $this->getQiniuPreviewUrl(
+            config('music.qiniu_accesskey'),
+            config('music.qiniu_secretkey'),
+            config('music.qiniu_preview_domain'),
+            $randomRow->qiniu_filename
+        );
         
+        
+        return view('music.listen', [
+            'randomRow' => $randomRow
+        ]);
     }
     
     public function editMusic(Request $request)
