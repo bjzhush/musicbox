@@ -12,6 +12,23 @@
 
 
 <div class="container-fluid">
+
+    <form name="listmusic" method="post" action="/listmusic">
+        <label>
+            状态：
+        </label>
+        <select class="selectpicker" name="mstatus">
+            <option value="">全部</option>
+            <option value="0">待处理</option>
+            <option value="1">已处理</option>
+            <option value="2">草稿</option>
+        </select>
+        <button class="btn btn-success" >确定</button>
+
+    </form>
+
+
+    </select>
     <div class="row-fluid">
         <div class="span12">
             <table class="table">
@@ -46,6 +63,7 @@
             </table>
         </div>
     </div>
+    {{ $musics->links() }}
 </div>
 
 

@@ -124,9 +124,13 @@ class MusicController extends Controller
 
     public function listMusic(Request $request)
     {
-        $musics = DB::table('music')
-            ->where('user_id', $this->getCrtUserId())
-            ->paginate(10);
+        $mStatus = $request->get('mstatus');
+        $dbMusic = DB::table('music')
+            ->where('user_id', $this->getCrtUserId());
+        if (strlen($mStatus)) {
+            $dbMusic->where('marked', $mStatus);
+        }
+        $musics = $dbMusic->paginate();
 
         foreach ($musics as &$row) {
             $row->markHtml = $this->getMarkHtml($row);
