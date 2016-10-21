@@ -42,7 +42,7 @@ class autoupload extends Command
         foreach ($config as $k =>  $item) {
            if (is_null($item))  {
               $this->error('necessary key '.$k.' not config, exit!');
-              exit;
+              return;
            }
         }
         
@@ -67,12 +67,12 @@ class autoupload extends Command
                                 $errorInfo = 'error moving file';
                                 $this->error($errorInfo.$file);
                                 $this->sendDesktopNotify($errorInfo);
-                                exit;
+                                return;
                             }
                         } else {
                             $this->error('response: '.$resJson);
                             $this->sendDesktopNotify($resJson);
-                            exit;
+                            return;
                         }
                     }
 
