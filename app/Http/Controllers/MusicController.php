@@ -69,6 +69,7 @@ class MusicController extends Controller
             foreach($files as $file) {
                 $fileTmpPath = $file->path();
                 $md5sum = md5_file($fileTmpPath);
+                $fileSize = filesize($fileTmpPath);
 
                 $md5sumCheck = DB::table('music')->where('filemd5', $md5sum)->first();
                 if (!empty($md5sumCheck)) {
@@ -97,6 +98,7 @@ class MusicController extends Controller
                     'uploadname' => $originName,
                     'user_id' => $this->getCrtUserId(),
                     'filemd5' => $md5sum,
+                    'filesize' => $fileSize,
                     'qiniu_id' => $uploadResult['hash'],
                     'qiniu_filename' => $uploadResult['key'],
                     'uploadcomment' => $comment,
@@ -125,6 +127,7 @@ class MusicController extends Controller
             'qiniu_id' => $request->get('qiniu_id'),
             'qiniu_filename' => $request->get('qiniu_filename'),
             'uploadcomment' => $request->get('uploadcomment'),
+            'filesize' => $request->get('filesize'),
             'created_at' => $request->get('created_at'),
         ];
         $res = DB::table('music')->insert($data);

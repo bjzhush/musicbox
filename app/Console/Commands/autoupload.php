@@ -71,9 +71,10 @@ class autoupload extends Command
 
                         if (!isset($uploadResult['error'])) {
                             $md5Sum = md5_file($config['localDir']).'/'.$file;
+                            $fileSize = filesize($config['localDir'].'/'.$file);
                             $mv = rename($config['localDir'].'/'.$file, $config['uploadedDir'].'/'.$file);
                             if ($mv) {
-                                $insertResponse = $this->insertDb($file, $config, $uploadResult, $md5Sum);
+                                $insertResponse = $this->insertDb($file, $config, $uploadResult, $md5Sum, $fileSize);
                                 $insertJson = json_decode($insertResponse, TRUE);
                                 if (!isset($insertJson['code']) || $insertJson['code'] !== 200) {
                                     //插入数据库错误
@@ -113,7 +114,7 @@ class autoupload extends Command
         $this->info('finish running '.date('Y-m-d H:i:s'));
     }
     
-    public function insertDb($file, $config, $uploadResult, $md5sum)
+    public function insertDb($file, $config, $uploadResult, $md5sum, $fileSize)
     {
 
         $post = array(
@@ -125,6 +126,7 @@ class autoupload extends Command
             'qiniu_filename' => $uploadResult['key'],
             'uploadcomment' => 'php auto upload',
             'created_at' => date('Y-m-d H:i:s'),
+            'filesize' => $fileSize,
             
             'userid' => $config['userId'],
             'authkey' => $config['uploadAuthKey'],
