@@ -56,51 +56,87 @@ class MusicController extends Controller
     
     public function uploadMusic(Request $request)
     {
-        $comment = $request->input('comment', '');
-        
-        if (!$request->hasFile('mfile')) {
-           return redirect('/uploadmusic?msg=no file uploaded');
-        }
-        
-        $files = $request->file('mfile');
-        foreach($files as $file) {
-            $fileTmpPath = $file->path();
-            $md5sum = md5_file($fileTmpPath);
+        try {
+            if (!is_null(Auth::User())) {
+                $userId = Auth::User()->id;
+                $isLogin = TRUE;
 
-            $md5sumCheck = DB::table('music')->where('filemd5', $md5sum)->first();
-            if (!empty($md5sumCheck)) {
-                echo 'Error:<font color="red">重复文件(id: '.$md5sumCheck->id.')已存在</font><br>';
-                echo '点<a href="/uploadmusic">这里</a>返回';
-                exit;
+            } else {
+                $userId =  $request->get('userid');
+                if(is_null($userId)) {
+                    exit('no userid get from post');
+                }
+                $isLogin = false;
+                $authKey = $request->get('authkey');
+                if ($authKey != env('AUTO_UPLOAD_AUTH_KEY')) {
+                    exit('auth key valid failed');
+                }
             }
 
-            $originName = $file->getClientOriginalName();
+            $comment = $request->input('comment', '');
 
-            $auth = new QiniuAuth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
-            $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
-
-            $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
-
-            $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
-
-            if (isset($uploadResult['error'])) {
-                echo 'Error:<font color="red">'.$uploadResult['error'].'</font>';
-                exit;
+            if (!$request->hasFile('mfile')) {
+                return redirect('/uploadmusic?msg=no file uploaded');
             }
 
-            DB::table('music')->insert([
-                'uploadname' => $originName,
-                'user_id' => $this->getCrtUserId(),
-                'filemd5' => $md5sum,
-                'qiniu_id' => $uploadResult['hash'],
-                'qiniu_filename' => $uploadResult['key'],
-                'uploadcomment' => $comment,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
+            if ($isLogin) {
+                $files = $request->file('mfile');
+            } else {
+                $files = [$request->file('mfile')];
+                
+            }
+            foreach($files as $file) {
+                $fileTmpPath = $file->path();
+                $md5sum = md5_file($fileTmpPath);
+
+                $md5sumCheck = DB::table('music')->where('filemd5', $md5sum)->first();
+                if (!empty($md5sumCheck)) {
+                    echo 'Error:<font color="red">重复文件(id: '.$md5sumCheck->id.')已存在</font><br>';
+                    echo '点<a href="/uploadmusic">这里</a>返回';
+                    exit;
+                }
+
+                $originName = $file->getClientOriginalName();
+
+                $auth = new QiniuAuth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
+                $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
+
+                $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
+
+                $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
+
+                if (isset($uploadResult['error'])) {
+                    echo 'Error:<font color="red">'.$uploadResult['error'].'</font>';
+                    exit;
+                }
+
+                DB::table('music')->insert([
+                    'uploadname' => $originName,
+                    'user_id' => $userId,
+                    'filemd5' => $md5sum,
+                    'qiniu_id' => $uploadResult['hash'],
+                    'qiniu_filename' => $uploadResult['key'],
+                    'uploadcomment' => $comment,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            if ($isLogin) {
+                return redirect('/uploadmusic?msg=success');
+            } else {
+                exit(json_encode(
+                    [
+                        'code' => '200',
+                        'msg' => 'success'
+                    ]
+                ));
+            }
+
+
+        } catch (\Exception $e) {
+            \App\Libs\LogService::logWrite('uploadException', $e->getMessage());
+            echo $e->getMessage();
         }
 
-        return redirect('/uploadmusic?msg=success');
-        
     }
 
     public function qiniuUpload($uploadToken, $file, $originName, $uploadApi)
