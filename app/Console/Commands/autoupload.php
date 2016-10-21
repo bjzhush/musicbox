@@ -104,6 +104,7 @@ class autoupload extends Command
             $post = array(
                 'userid' => $config['userId'],
                 'authkey' => $config['uploadAuthKey'],
+                'comment' => 'phpauto',
                 'mfile'=> $cFile
             );
             $ch = curl_init();
