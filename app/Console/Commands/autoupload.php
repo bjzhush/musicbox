@@ -82,7 +82,7 @@ class autoupload extends Command
                                     return;
                                     
                                 }
-                                $this->info('succeed upload '.$file);
+                                $this->info(date('Y-m-d H:i:s').'succeed upload '.$file);
                             } else {
                                 //移动文件错误
                                 $errorInfo = 'error moving file';
