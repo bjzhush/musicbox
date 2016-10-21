@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Inspiring;
+use Qiniu\Auth as QiniuAuth;
 
 class autoupload extends Command
 {
@@ -57,21 +58,42 @@ class autoupload extends Command
                 
                 if (count($musicFiles)) {
                     foreach($musicFiles as $file) {
-                        $resJson = $this->uploadMusic($file, $config);
-                        $resArr = json_decode($resJson, TRUE);
-                        if (!is_null($resArr) && isset($resArr['code']) && $resArr['code'] == 200) {
+
+                        $auth = new QiniuAuth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
+                        $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
+
+                        $musicService = new \App\Libs\MusicService();
+                        $filePath = $config['localDir'].'/'.$file;
+
+                        $qiniuResponse = $musicService->qiniuUpload($uploadToken, $filePath, $file, config('music.qiniu_upload_api'));
+
+                        $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
+
+                        if (!isset($uploadResult['error'])) {
+                            $md5Sum = md5_file($config['localDir']).'/'.$file;
                             $mv = rename($config['localDir'].'/'.$file, $config['uploadedDir'].'/'.$file);
                             if ($mv) {
+                                $insertResponse = $this->insertDb($file, $config, $uploadResult, $md5Sum);
+                                $insertJson = json_decode($insertResponse, TRUE);
+                                if (!isset($insertJson['code']) || $insertJson['code'] !== 200) {
+                                    //插入数据库错误
+                                    $this->error($insertResponse.$file);
+                                    $this->sendDesktopNotify($insertResponse);
+                                    return;
+                                    
+                                }
                                 $this->info('succeed upload '.$file);
                             } else {
+                                //移动文件错误
                                 $errorInfo = 'error moving file';
                                 $this->error($errorInfo.$file);
                                 $this->sendDesktopNotify($errorInfo);
                                 return;
                             }
                         } else {
-                            $this->error('response: '.$resJson);
-                            $this->sendDesktopNotify($resJson);
+                            //上传七牛错误
+                            $this->error('response: '.$qiniuResponse);
+                            $this->sendDesktopNotify($qiniuResponse);
                             return;
                         }
                     }
@@ -91,33 +113,32 @@ class autoupload extends Command
         $this->info('finish running '.date('Y-m-d H:i:s'));
     }
     
-    public function uploadMusic($file, $config)
+    public function insertDb($file, $config, $uploadResult, $md5sum)
     {
-        if (!in_array($file, ['.','..'])) {
-            $file = $config['localDir'].'/'.$file;
 
-            if (function_exists('curl_file_create')) { // php 5.6+
-                $cFile = curl_file_create($file);
-            } else { //
-                $cFile = realpath($file);
-            }
-            $post = array(
-                'userid' => $config['userId'],
-                'authkey' => $config['uploadAuthKey'],
-                'comment' => 'phpauto',
-                'mfile'=> $cFile
-            );
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,$config['uploadUrl']);
-            curl_setopt($ch, CURLOPT_POST,1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,0);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 600); //timeout in seconds
-            $result=curl_exec ($ch);
-            curl_close ($ch);
-            return $result;
-        }
+        $post = array(
+
+            'uploadname' => $file,
+            'user_id' => $config['userId'],
+            'filemd5' => $md5sum,
+            'qiniu_id' => $uploadResult['hash'],
+            'qiniu_filename' => $uploadResult['key'],
+            'uploadcomment' => 'php auto upload',
+            'created_at' => date('Y-m-d H:i:s'),
+            
+            'userid' => $config['userId'],
+            'authkey' => $config['uploadAuthKey'],
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,$config['uploadUrl']);
+        curl_setopt($ch, CURLOPT_POST,1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 600); //timeout in seconds
+        $result=curl_exec ($ch);
+        curl_close ($ch);
+        return $result;
 
     }
     

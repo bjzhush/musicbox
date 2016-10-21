@@ -57,21 +57,6 @@ class MusicController extends Controller
     public function uploadMusic(Request $request)
     {
         try {
-            if (!is_null(Auth::User())) {
-                $userId = Auth::User()->id;
-                $isLogin = TRUE;
-
-            } else {
-                $userId =  $request->get('userid');
-                if(is_null($userId)) {
-                    exit('no userid get from post');
-                }
-                $isLogin = false;
-                $authKey = $request->get('authkey');
-                if ($authKey != env('AUTO_UPLOAD_AUTH_KEY')) {
-                    exit('auth key valid failed');
-                }
-            }
 
             $comment = $request->input('comment', '');
 
@@ -79,12 +64,8 @@ class MusicController extends Controller
                 return redirect('/uploadmusic?msg=no file uploaded');
             }
 
-            if ($isLogin) {
-                $files = $request->file('mfile');
-            } else {
-                $files = [$request->file('mfile')];
-                
-            }
+            $files = $request->file('mfile');
+            
             foreach($files as $file) {
                 $fileTmpPath = $file->path();
                 $md5sum = md5_file($fileTmpPath);
@@ -100,8 +81,10 @@ class MusicController extends Controller
 
                 $auth = new QiniuAuth(config('music.qiniu_accesskey'), config('music.qiniu_secretkey'));
                 $uploadToken = $auth->uploadToken(config('music.qiniu_bucket'));
+                
+                $musicService = new \App\Libs\MusicService();
 
-                $qiniuResponse = $this->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
+                $qiniuResponse = $musicService->qiniuUpload($uploadToken, $file, $originName, config('music.qiniu_upload_api'));
 
                 $uploadResult = \Qiniu\json_decode($qiniuResponse, TRUE);
 
@@ -112,7 +95,7 @@ class MusicController extends Controller
 
                 DB::table('music')->insert([
                     'uploadname' => $originName,
-                    'user_id' => $userId,
+                    'user_id' => $this->getCrtUserId(),
                     'filemd5' => $md5sum,
                     'qiniu_id' => $uploadResult['hash'],
                     'qiniu_filename' => $uploadResult['key'],
@@ -120,17 +103,7 @@ class MusicController extends Controller
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             }
-            if ($isLogin) {
                 return redirect('/uploadmusic?msg=success');
-            } else {
-                exit(json_encode(
-                    [
-                        'code' => '200',
-                        'msg' => 'success'
-                    ]
-                ));
-            }
-
 
         } catch (\Exception $e) {
             \App\Libs\LogService::logWrite('uploadException', $e->getMessage());
@@ -138,24 +111,37 @@ class MusicController extends Controller
         }
 
     }
-
-    public function qiniuUpload($uploadToken, $file, $originName, $uploadApi)
+    
+    public function insertMusic(Request $request)
     {
-        if (function_exists('curl_file_create')) { // php 5.6+
-            $cFile = curl_file_create($file);
-        } else { //
-            $cFile = realpath($file);
+        $authKey = $request->get('authkey');
+        if ($authKey !== env('AUTO_UPLOAD_AUTH_KEY')) {
+            return $this->jsonFail('authkey fail');
         }
-        $post = array('token' => $uploadToken, 'key' => date('YmdHis').'_'.$originName, 'file'=> $cFile);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,$uploadApi);
-        curl_setopt($ch, CURLOPT_POST,1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        $result=curl_exec ($ch);
-        curl_close ($ch);
-        return $result;
+        $data = [
+            'uploadname' => $request->get('uploadname'),
+            'user_id' => $request->get('user_id'),
+            'filemd5' => $request->get('filemd5'),
+            'qiniu_id' => $request->get('qiniu_id'),
+            'qiniu_filename' => $request->get('qiniu_filename'),
+            'uploadcomment' => $request->get('uploadcomment'),
+            'created_at' => $request->get('created_at'),
+        ];
+        $res = DB::table('music')->insert($data);
+        if ($res) {
+           return $this->jsonSuccess('success');
+        } else {
+           return $this->jsonFail('fail');
+        }
     }
+    
+    public function jsonResponse($code, $msg) {
+        return json_encode([
+            'code' => $code,
+            'msg' => $msg,
+        ]);
+    }
+
     
 
     public function listMusic(Request $request)

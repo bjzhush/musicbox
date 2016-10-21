@@ -10,11 +10,13 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-Route::post('/uploadmusic', 'MusicController@uploadMusic');
+
+Route::post('/insertmusic', 'MusicController@insertMusic');
 
 Route::group(['middleware' => 'auth'], function () {
     //上传
     Route::get('/uploadmusic', 'MusicController@viewUploadMusic');
+    Route::post('/uploadmusic', 'MusicController@uploadMusic');
 
 
     //列表
