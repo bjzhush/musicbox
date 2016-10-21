@@ -112,6 +112,8 @@ class autoupload extends Command
             curl_setopt($ch, CURLOPT_POST,1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,0);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 600); //timeout in seconds
             $result=curl_exec ($ch);
             curl_close ($ch);
             return $result;
@@ -120,6 +122,6 @@ class autoupload extends Command
     }
     
     public function sendDesktopNotify($content) {
-        file_put_contents('/tmp/notify_box.sh',"DISPLAY=:0.0 notify-send 'Allydata Exception' '".$content." ".date('Y-m-d H:i:s')."'".PHP_EOL, FILE_APPEND);
+        file_put_contents('/tmp/notify_box.sh',"DISPLAY=:0.0 notify-send 'MusicUpload Exception' '".$content." ".date('Y-m-d H:i:s')."'".PHP_EOL, FILE_APPEND);
     }
 }
