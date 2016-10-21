@@ -99,8 +99,8 @@ class autoupload extends Command
                     }
 
                 } else {
-                    $this->info('no task,sleeping 600');
-                    sleep(600);
+                    $this->info('no task,sleeping 60');
+                    sleep(60);
                 }
             }
             
