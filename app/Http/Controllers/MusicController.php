@@ -210,6 +210,15 @@ class MusicController extends Controller
             config('music.qiniu_preview_domain'),
             $randomRow->qiniu_filename
         );
+
+        DB::table('playhistory')->insert(
+            [
+               'userid' => $this->getCrtUserId(),
+               'musicid' => $randomId,
+               'type' => 1,  //1 for start play ,2 for end play
+               'created_at' => date('Y-m-d H:i:s'),
+            ]
+        );
         
         
         return view('music.listen', [
