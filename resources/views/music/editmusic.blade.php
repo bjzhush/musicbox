@@ -2,6 +2,7 @@
 <script>
     $(document).ready(function() {
 
+
         function searchArtist(artist) {
             $.ajax({
                 url:'/searchartist',
@@ -16,6 +17,7 @@
                             text : text
                         }));
                     });
+                    $('#artist_search').selectpicker('refresh');
                 }
             });
         };
@@ -94,10 +96,11 @@
             <!-- Search input-->
             <div class="controls">
                 <label class="control-label">歌手名</label>
-                <input type="text" placeholder="搜索或输入" value="{{isset($musicInfo->artist) ? $musicInfo->artist : ''}}" class="input-xlarge search-query" id="artist_input" artistid="{{$musicInfo->artistid}}">
+                <input type="text" placeholder="搜索或输入" value="{{isset($musicInfo->artist) ? $musicInfo->artist : ''}}" class="form-control" id="artist_input" artistid="{{$musicInfo->artistid}}">
 
-                <select name="artist_search" id="artist_search">
+                <select name="artist_search" id="artist_search" class="selectpicker">
                 </select>
+
 
 
             </div>
