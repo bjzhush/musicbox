@@ -61,8 +61,19 @@
             if (selectedValue > 0) {
                 $('#artist_input').val($(this).find("option:selected").text());
             }
-
         })
+
+        $('.newtag').bind("enterKey",function(e){
+            alert($(this).val());
+        });
+
+        $('.newtag').keyup(function(e){
+            //回车
+            if(e.keyCode == 13)
+            {
+                $(this).trigger("enterKey");
+            }
+        });
             
     });
 </script>
@@ -98,6 +109,13 @@
             </div>
 
         </div>
+
+        <input type="text" placeholder="标签" class="newtag">
+        <div class="tagList">
+
+        </div>
+
+
 
 
         <button class="btn btn-success" id="savemusic">保存</button>
