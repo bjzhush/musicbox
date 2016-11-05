@@ -262,6 +262,58 @@ class MusicController extends Controller
                 'updated_at' => date('Y-m-d H:i:s'),
                 'marked' => $isDraft,
             ]);
+
+        //tags
+        $tags = $request->get('tags', NULL);
+        if (!is_null($tags)) {
+            $arrTags = explode(' ', $tags );
+            foreach ($arrTags as $k => $v) {
+               $arrTags[$k] = trim($v);
+               if (strlen(trim($v)) == 0)  {
+                  unset($arrTags[$k]);
+               }
+            }
+            sort($arrTags);
+
+            $existedTags = DB::table('tag')
+                ->select('id', 'tagname')
+                ->whereIn('tagname', $arrTags)
+                ->get();
+            $tagsToInsert = $arrTags;
+            foreach ($existedTags as $row) {
+                if (in_array($row->tagname, $tagsToInsert )) {
+                    unset($tagsToInsert[array_search($row->tagname, $tagsToInsert)]);
+                }
+            }
+            if (count($tagsToInsert)) {
+                $data = [];
+                foreach ($tagsToInsert as $tag) {
+                    $data[] = [
+                        'tagname' => $tag,
+                        'created_at' => date('Y-m-d H:i:s'),
+                    ];
+                }
+                DB::table('tag')->insert($data);
+            }
+
+            $tags = DB::table('tag')
+                ->select('id', 'tagname')
+                ->whereIn('tagname', $arrTags)
+                ->get();
+
+
+            $data = [];
+            foreach ($tags as $tag) {
+                $data[] = [
+                    'musid' => $musicId,
+                    'tagid' => $tag->id,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+            DB::table('musictag')->where('musid', $musicId)->delete();
+            DB::table('musictag')->insert($data);
+
+        }
         
         return $this->jsonSuccess('success');
     }

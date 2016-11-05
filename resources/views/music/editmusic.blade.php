@@ -30,6 +30,7 @@
             data['artist_id'] = $('#artist_input').attr('artistid');
             data['artist_name'] = $('#artist_input').val();
             data['is_draft'] = $('#isdraft').is(":checked") ? 2 : 1;
+            data['tags'] = $('#tags').val();
 
             $.ajax({
                 type: 'POST',
