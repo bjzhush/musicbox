@@ -142,7 +142,7 @@
 
             <label class="control-label">标签列表</label>
             <div class="form-inline">
-                <input type="text" placeholder="标签" id="tags" class="form-control">
+                <input type="text" placeholder="标签" id="tags" class="form-control" value="{{$tags}}">
             </div>
 
         </div>

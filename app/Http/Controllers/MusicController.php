@@ -320,19 +320,32 @@ class MusicController extends Controller
     
     public function viewEditMusic(Request $request)
     {
-        $muiscId = $request->get('musicid');
-        if (is_null($muiscId)) {
+        $musicId = $request->get('musicid');
+        if (is_null($musicId)) {
            exit('no music found');
         }
-        $musicInfo = DB::table('music')->where('id', $muiscId)->first();
+        $musicInfo = DB::table('music')->where('id', $musicId)->first();
 
         if ($musicInfo->artistid > 0) {
             $artistRow = DB::table('artist')->select('artist')->where('id', $musicInfo->artistid)->first();
             $musicInfo->artist = $artistRow->artist;
         }
 
+        $tags = DB::table('musictag')
+            ->select('tag.tagname')
+            ->leftJoin('tag', 'tag.id', '=', 'musictag.tagid')
+            ->where('musictag.musid', $musicId)
+            ->get();
+        $strTags = '';
+        if (count($tags)) {
+            foreach ($tags as $tag) {
+               $strTags .= $tag->tagname.' ';
+            }
+        } 
+
         return view('music.editmusic', [
-            'musicInfo' => $musicInfo
+            'musicInfo' => $musicInfo,
+            'tags' => $strTags,
         ]);
     }
 
