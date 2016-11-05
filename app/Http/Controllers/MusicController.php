@@ -150,10 +150,16 @@ class MusicController extends Controller
     public function listMusic(Request $request)
     {
         $mStatus = $request->get('mstatus');
+        $keyword = $request->get('keyword', NULL);
         $dbMusic = DB::table('music')
             ->where('user_id', $this->getCrtUserId());
         if (strlen($mStatus)) {
             $dbMusic->where('marked', $mStatus);
+        }
+        if (!is_null($keyword)) {
+           $dbMusic->leftJoin('artist', 'music.artistid', '=', 'artist.id')
+               ->where('music.uploadname', 'like', '%'.$keyword.'%')
+               ->orWhere('artist.artist', 'like', '%'.$keyword.'%');
         }
         $musics = $dbMusic->paginate();
 
@@ -169,6 +175,7 @@ class MusicController extends Controller
 
         return view('music.listmusic', [
             'musics' => $musics,
+            'keyword' => (string)$keyword,
         ]);
     }
 

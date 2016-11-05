@@ -23,6 +23,7 @@
             <option value="1">已处理</option>
             <option value="2">草稿</option>
         </select>
+        <input name="keyword" value="{{$keyword}}">
         <button class="btn btn-success" >确定</button>
 
     </form>
