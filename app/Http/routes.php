@@ -31,6 +31,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::any('/listen', 'MusicController@listen');
     
+    Route::post('searchtag', 'MusicController@searchtag');
+    
 });
 
 

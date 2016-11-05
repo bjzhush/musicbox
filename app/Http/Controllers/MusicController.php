@@ -304,4 +304,25 @@ class MusicController extends Controller
        }
        return json_encode($res);
     }
+
+    public function searchTag(Request $request) {
+       $tag = $request->get('tag');
+       if (strlen($tag) == 0) {
+           $res = ['0' => '无结果'];
+       } else {
+           $sqlRes = DB::table('tag')
+               ->where('tagname', 'like', '%'.$tag.'%')
+               ->take(20)
+               ->get();
+           if (empty($sqlRes)) {
+               $res = ['0' => '无结果'];
+           } else {
+               $res = ['0' => '请选择'];
+               foreach ($sqlRes as $row) {
+                   $res[$row->id] = $row->tagname;
+               }
+           }
+       }
+       return json_encode($res);
+    }
 }

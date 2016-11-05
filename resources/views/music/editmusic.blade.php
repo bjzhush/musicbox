@@ -51,7 +51,7 @@
 
         $('#artist_search').hide();
 
-        $('#artist_input').change(function(){
+        $('#artist_input').on("input", function(){
             var inputArtist = $(this).val();
             searchArtist(inputArtist);
             $('#artist_search').show();
@@ -65,19 +65,51 @@
             }
         })
 
-        $('.newtag').bind("enterKey",function(e){
-            alert($(this).val());
+        $('#newtag').on("input",function(e){
+
+            $('#mysqlTags').empty();
+
+            $.ajax({
+                type: 'POST',
+                url: '/searchtag',
+                data: 'tag='+$('#newtag').val(),
+                dataType: 'json',
+                success: function( json ) {
+                    $('#mysqlTags').find('option').remove();
+                    $.each(json, function(index, text){
+                        $('#mysqlTags').append($('<option>', {
+                            value: index,
+                            text : text
+                        }));
+                    });
+                    $('#mysqlTags').selectpicker('refresh');
+                }
+
+
+            });
         });
 
-        $('.newtag').keyup(function(e){
-            //回车
-            if(e.keyCode == 13)
-            {
-                $(this).trigger("enterKey");
+
+        $('#mysqlTags').on('change', function () {
+            var currentTag = $('#mysqlTags').find(':selected').text();
+            if (currentTag !== '请选择') {
+                var crtTags = $('#tags').val().split(" ");
+                var isRepeat = false;
+                $.each(crtTags, function (index, value) {
+                    if (currentTag == value) {
+                       isRepeat = true;
+                    }
+                })
+                if (!isRepeat) {
+                    $('#tags').val($('#tags').val() + ' ' + currentTag);
+                }
             }
         });
-            
+
+
     });
+
+
 </script>
 
 
@@ -89,8 +121,6 @@
         </div>
         <input type="hidden" id="musicid" value="{{$musicInfo->id}}">
 
-
-
         <div class="control-group">
 
             <!-- Search input-->
@@ -100,21 +130,19 @@
 
                 <select name="artist_search" id="artist_search" class="selectpicker">
                 </select>
-
-
-
-            </div>
-            <div class="controls">
-                暂存 <input type="checkbox" id="isdraft" value="0">
-
-                <div class="col-xs-12" style="height:50px;"></div>
-
             </div>
 
-        </div>
+            <label class="control-label">标签搜索</label>
+            <div class="form-inline">
+                <input type="text" placeholder="标签" id="newtag" class="bs-searchbox">
+                <select name="mysqlTags" id="mysqlTags" class="selectpicker">
+                </select>
+            </div>
 
-        <input type="text" placeholder="标签" class="newtag">
-        <div class="tagList">
+            <label class="control-label">标签列表</label>
+            <div class="form-inline">
+                <input type="text" placeholder="标签" id="tags" class="form-control">
+            </div>
 
         </div>
 
