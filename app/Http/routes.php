@@ -12,6 +12,7 @@
 */
 
 Route::post('/insertmusic', 'MusicController@insertMusic');
+Route::any('/listenmusic', 'MusicController@listenMusic');
 
 Route::group(['middleware' => 'auth'], function () {
     //上传
@@ -30,7 +31,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/searchartist', 'MusicController@searchArtist');
 
     Route::any('/listen', 'MusicController@listen');
-    Route::any('/listenmusic', 'MusicController@listenMusic');
     
     Route::post('searchtag', 'MusicController@searchtag');
     
