@@ -198,6 +198,26 @@ class MusicController extends Controller
         return $auth->privateDownloadUrl($previewDomain.'/'.$qiniuFileName);
     }
     
+    public function listenMusic(Request $request)
+    {
+        $id = $request->id;
+        if (is_null($id)) {
+            exit('no id found');
+        }
+        $randomRow = DB::table('music')->where('id', $id)->first();
+
+        $randomRow->listenUrl = $this->getQiniuPreviewUrl(
+            config('music.qiniu_accesskey'),
+            config('music.qiniu_secretkey'),
+            config('music.qiniu_preview_domain'),
+            $randomRow->qiniu_filename
+        );
+
+        return view('music.listenmusic', [
+            'randomRow' => $randomRow
+        ]);
+    }
+
     public function listen(Request $request)
     {
         $maxIdRow = DB::table('music')->select('id')->orderby('id','desc')->first();

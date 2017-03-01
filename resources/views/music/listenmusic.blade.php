@@ -1,4 +1,3 @@
-@include('nav')
 
 <script type='text/javascript'>
     $(document).ready(function(){
@@ -53,6 +52,5 @@
         <source src="{{$randomRow->listenUrl}}" type="audio/mpeg" />
         Your browser does not support the audio element.
     </audio>
-    <a href='/listenmusic?id={{$randomRow->id}}'><h4>Share</h4></a>
 
     <h1>现在播放的是：<font color="#ff0000">{{$randomRow->uploadname}}</font></h1>
